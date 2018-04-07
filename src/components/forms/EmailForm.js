@@ -1,12 +1,13 @@
 import React, { Component } from 'react'
-import { Alert, Button, Form, FormGroup, Label, Input } from 'reactstrap'
+import { Alert, Button, Fade, Form, FormGroup, Label, Input } from 'reactstrap'
 
 class EmailForm extends Component {
   constructor(props) {
     super(props)
-    this.state = {error: '', recipientEmail: '', message: '', subject: ''}
+    this.state = {error: '', recipientEmail: '', message: '', subject: '', emailSent: false}
     this.handleSubmit = this.handleSubmit.bind(this)
     this.handleFieldChange = this.handleFieldChange.bind(this)
+    this.resetStates = this.resetStates.bind(this)
   }
 
   async handleSubmit() {
@@ -30,6 +31,8 @@ class EmailForm extends Component {
       this.setState({
         error: `Email could not be delivered. We have tried ${jsonResponse.tryCount} time(s).`
       })
+    } else {
+      this.setState({emailSent: true})
     }
   }
 
@@ -37,8 +40,23 @@ class EmailForm extends Component {
     this.setState({[e.target.name]: e.target.value})
   }
 
+  resetStates() {
+    this.setState({
+      error: '',
+      recipientEmail: '',
+      message: '',
+      subject: '',
+      emailSent: false
+    })
+  }
+
   render() {
-    return (
+    return this.state.emailSent ? (
+      <Fade in={this.state.emailSent} unmountOnExit>
+        <h1>CONGRATS!</h1>
+        <Button color="primary" onClick={this.resetStates}>Send Another One</Button>
+      </Fade>
+    ) : (
       <Form>
         {this.state.error && <Alert color="danger">{this.state.error}</Alert>}
         <h1 style={styles.title}>Send Email Painlessly</h1>
